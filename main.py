@@ -37,7 +37,9 @@ class Img(QWidget):
         if event.key() == Qt.Key_PageUp:
             self.spn = str(float(self.spn) + 0.01)
             self.show_img()
-
+        if event.key() == Qt.Key_Right:
+            self.longitude = str(float(self.spn) + float(self.longitude))
+            self.show_img()
 
 
 app = QApplication(sys.argv)
