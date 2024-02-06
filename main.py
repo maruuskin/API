@@ -1,46 +1,36 @@
-import json
 import sys
-from io import BytesIO
-from delta import find_delta
-
-
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QWidget, QLabel, QApplication
 import requests
-from PIL import Image
 
-toponym_to_find = " ".join(sys.argv[1:])
-
-geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
-geocoder_params = {
-    "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
-    "geocode": toponym_to_find,
-    "format": "json"}
-
-response = requests.get(geocoder_api_server, params=geocoder_params)
-
-if not response:
-    pass
+longitude, lattitude = '37.6156', '55.7522'
+spn = '0.05'
 
 
-json_response = response.json()
-# with open('scoring.json', 'w', encoding='utf-8') as file:
-#     file.write(response.text)
-toponym = json_response["response"]["GeoObjectCollection"][
-    "featureMember"][0]["GeoObject"]
-l_corner = toponym['boundedBy']['Envelope']['lowerCorner']
-up_corner = toponym['boundedBy']['Envelope']['upperCorner']
-toponym_coodrinates = toponym["Point"]["pos"]
-toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
-delta = find_delta(l_corner, up_corner)
+class Img(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.get_img()
+        self.label = QLabel(self)
+        pixmap = QPixmap('img.jpg')
+        self.label.setPixmap(pixmap)
+        self.resize(pixmap.width(), pixmap.height())
+        self.show()
 
-map_params = {
-    "ll": ",".join([toponym_longitude, toponym_lattitude]),
-    "spn": ",".join([delta, delta]),
-    "l": "map",
-    "pt": ",".join([toponym_longitude, toponym_lattitude])
-}
+    def get_img(self):
+        map_params = {
+            "ll": ",".join([longitude, lattitude]),
+            "spn": ",".join([spn, spn]),
+            "l": "map",
+        }
+        map_api_server = "http://static-maps.yandex.ru/1.x/"
+        response = requests.get(map_api_server, params=map_params)
+        print(response)
 
-map_api_server = "http://static-maps.yandex.ru/1.x/"
-response = requests.get(map_api_server, params=map_params)
+        with open('img.jpg', 'wb') as file:
+            file.write(response.content)
 
-Image.open(BytesIO(
-    response.content)).show()
+
+app = QApplication(sys.argv)
+ex = Img()
+sys.exit(app.exec())
