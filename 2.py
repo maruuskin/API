@@ -1,18 +1,25 @@
 import csv
 import json
 
-list_line = []
-with open('2.csv') as f:
-    csv_file = csv.reader(f, delimiter=';')
-    for line in csv_file:
-        list_line.append(line)
-lines = {}
-for elem in list_line:
-    if elem[0] not in lines:
-        lines[elem[0]] = [elem[1]]
-    else:
-        lines[elem[0]].append(elem[1])
-with open('result.json', 'w') as f:
-    json.dump(lines, f, indent=4)
-
-print(lines)
+cnt = 0
+ans = []
+dict = {}
+sett = set()
+with open('battles.csv', encoding="utf8") as csvfile:
+    reader = csv.reader(csvfile, delimiter=':', quotechar='"')
+    for index, row in enumerate(reader):
+        if index != 0:
+            if row[4] == '1':
+                dict[row[2]] = dict.get(row[2], 0) + int(row[3])
+                sett.add(row[2])
+sett = sorted(list(sett))
+for i in sett:
+    key = i
+    val = dict[i]
+    sl = {
+        "monster": key,
+        "success": val
+    }
+    ans.append(sl)
+with open('fights.json', 'w') as f:
+    json.dump(ans, f, indent=4)
