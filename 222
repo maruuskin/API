@@ -1,0 +1,20 @@
+import csv
+import json
+
+cnt = 0
+ans = []
+dict = {}
+with open('battles.csv', encoding="utf8") as csvfile:
+    reader = csv.reader(csvfile, delimiter=':', quotechar='"')
+    for index, row in enumerate(reader):
+        if index != 0:
+            if row[4] == '1':
+                dict[row[2]] = dict.get(row[2], 0) + int(row[3])
+for key, val in dict.items():
+    sl = {
+        "monster": key,
+        "success": val
+    }
+    ans.append(sl)
+with open('fights.json', 'w') as f:
+    json.dump(ans, f, indent=4)
